@@ -1,56 +1,63 @@
+import chess
 from ChessEngine import ChessEngine
-import random
 
 
 class BruteForce(ChessEngine):
     def __init__(self, player_color):
         super().__init__(player_color)
 
+        self.__computer_color = not player_color
         self.__position_evaluations = {}
-
-    def __get_average_evaluation(self, game_state, ply):
-        key = game_state.board_fen()
-        average_evaluation = 0
-        legal_moves = list(game_state.legal_moves)
-
-        if key in self.__position_evaluations:
-            return self.__position_evaluations[key]
-
-        current_position_evaluation = game_state.evaluate_position()
-
-        if ply == 0 or len(legal_moves) == 0:
-            average_evaluation = current_position_evaluation
-        else:
-            position_evaluation = current_position_evaluation
-            total_evaluation = 0
-            
-            for move in legal_moves:
-                game_state.push(move)
-                total_evaluation += self.__get_average_evaluation(game_state, ply-1)
-                game_state.pop()
-            
-            average_evaluation = (position_evaluation + (total_evaluation / len(legal_moves))) / 2
-
-        self.__position_evaluations[key] = average_evaluation
-
-        return average_evaluation
     
-    def __search(self, game_state, ply):
-        best_move = None
-        best_move_advantage = None
+    def __get_legal_moves(self, game_state):
+        return list(game_state.legal_moves)
 
-        for move in game_state.legal_moves:
+    def __min_value(self, game_state, ply):
+        legal_moves = self.__get_legal_moves(game_state)
+
+        if ply <= 0 or len(legal_moves) == 0:
+            return (None, self._board.evaluate_position())
+        
+        best_move = None
+        best_move_value = None
+
+        for move in legal_moves:
             game_state.push(move)
-            move_advantage = self.__get_average_evaluation(game_state, ply)
+            future_best_move, move_value = self.__max_value(game_state, ply-1)
             game_state.pop()
 
-            if best_move is None or move_advantage > best_move_advantage:
+            if not best_move or move_value < best_move_value:
                 best_move = move
-                best_move_advantage = move_advantage
-    
-        return best_move
+                best_move_value = move_value
+        
+        return (best_move, best_move_value)
 
+    def __max_value(self, game_state, ply):
+        legal_moves = self.__get_legal_moves(game_state)
+
+        if ply <= 0 or len(legal_moves) == 0:
+            return (None, self._board.evaluate_position())
+        
+        best_move = None
+        best_move_value = None
+
+        for move in legal_moves:
+            game_state.push(move)
+            future_best_move, move_value = self.__min_value(game_state, ply-1)
+            game_state.pop()
+
+            if not best_move or move_value > best_move_value:
+                best_move = move
+                best_move_value = move_value
+        
+        return (best_move, best_move_value)
+    
+    def __search(self, ply):
+        if self.__computer_color == chess.WHITE:
+            return self.__max_value(self._board, ply)[0]
+        else:
+            return self.__min_value(self._board, ply)[0]
     
     def _computer_move(self):
-        return self.__search(self._board, 2)
+        return self.__search(3)
             
