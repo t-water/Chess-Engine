@@ -41,7 +41,6 @@ class ChessEngine(ABC):
             else:
                 self._board.push(self._computer_move())
             
-            self.__increment_turn()
             outcome = self._board.outcome()
             
         self.__print_board()
