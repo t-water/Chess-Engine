@@ -1,17 +1,12 @@
 import chess
 from abc import ABC, abstractmethod
 
+from EvaluationBoard import EvaluationBoard
+
 class ChessEngine(ABC):
     def __init__(self, player_color):
         self.__player_color = player_color
-        self._board = chess.Board()
-        self.__turn = 0
-    
-    def __increment_turn(self):
-        self.__turn += 1
-    
-    def __is_whites_turn(self):
-        return self.__turn % 2 == 0
+        self._board = EvaluationBoard()
 
     def __print_board(self):
         print()
@@ -39,7 +34,7 @@ class ChessEngine(ABC):
         while(outcome is None):
             self.__print_board()
 
-            is_players_turn = self.__player_color == self.__is_whites_turn()
+            is_players_turn = self.__player_color == self._board.turn
 
             if is_players_turn:
                 self.__player_move()
