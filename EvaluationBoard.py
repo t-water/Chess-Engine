@@ -15,7 +15,7 @@ class EvaluationBoard(chess.Board):
 
     center_square_value = 0.25
     development_value = 0.1
-    checkmate_value = 100
+    checkmate_value = 1000
 
     def __init__(self):
         super().__init__()
@@ -29,7 +29,7 @@ class EvaluationBoard(chess.Board):
             if square_piece:
                 square_piece_value = EvaluationBoard.piece_values.get(square_piece.piece_type, 0)
 
-                if square_piece.color == self.turn:
+                if square_piece.color == chess.WHITE:
                     total += square_piece_value
                 else:
                     total -= square_piece_value
@@ -40,11 +40,11 @@ class EvaluationBoard(chess.Board):
         total = 0
 
         for square in EvaluationBoard.center_squares:
-            players_attacking_pieces = self.attackers(self.turn, square)
-            opponents_attacking_pieces = self.attackers(not self.turn, square)
+            white_attacking_pieces = self.attackers(chess.WHITE, square)
+            black_attacking_pieces = self.attackers(chess.BLACK, square)
 
-            total += len(players_attacking_pieces) * EvaluationBoard.center_square_value
-            total -= len(opponents_attacking_pieces) * EvaluationBoard.center_square_value
+            total += len(white_attacking_pieces) * EvaluationBoard.center_square_value
+            total -= len(black_attacking_pieces) * EvaluationBoard.center_square_value
 
         return total
     
@@ -57,15 +57,24 @@ class EvaluationBoard(chess.Board):
             if square_piece == chess.BISHOP or square_piece == chess.KNIGHT:
                 total += -EvaluationBoard.development_value if square_piece.color == chess.WHITE else EvaluationBoard.development_value
 
-        return total if self.turn == chess.WHITE else -total
-         
+        return total
     
-    def evaluate_position(self):
-        evaluation = 0
+    def __game_is_terminated(self):
+        return self.outcome() is None
+
+    def __termination_value(self):
         is_whites_turn = self.turn == chess.WHITE
 
         if self.is_checkmate():
-            return -EvaluationBoard.checkmate_value if is_whites_turn else EvaluationBoard.checkmate_value 
+            return -EvaluationBoard.checkmate_value if is_whites_turn else EvaluationBoard.checkmate_value
+        
+        return 0
+    
+    def evaluate_position(self):
+        evaluation = 0
+
+        if self.__game_is_terminated():
+            self.__termination_value()
 
         evaluation += self.__material_advantage()
         evaluation += self.__center_square_advantage()

@@ -16,9 +16,12 @@ class BruteForce(ChessEngine):
         if key in self.__position_evaluations:
             return self.__position_evaluations[key]
 
+        current_position_evaluation = game_state.evaluate_position()
+
         if ply == 0 or len(legal_moves) == 0:
-            average_evaluation = game_state.evaluate_position()
+            average_evaluation = current_position_evaluation
         else:
+            position_evaluation = current_position_evaluation
             total_evaluation = 0
             
             for move in legal_moves:
@@ -26,7 +29,7 @@ class BruteForce(ChessEngine):
                 total_evaluation += self.__get_average_evaluation(game_state, ply-1)
                 game_state.pop()
             
-            average_evaluation = total_evaluation / len(legal_moves)
+            average_evaluation = (position_evaluation + (total_evaluation / len(legal_moves))) / 2
 
         self.__position_evaluations[key] = average_evaluation
 
@@ -49,5 +52,5 @@ class BruteForce(ChessEngine):
 
     
     def _computer_move(self):
-        return self.__search(self._board, 3)
+        return self.__search(self._board, 2)
             
