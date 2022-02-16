@@ -9,7 +9,7 @@ class BruteForce(ChessEngine):
         self.__position_evaluations = {}
 
     def __get_average_evaluation(self, game_state, ply):
-        key = game_state.fen()
+        key = game_state.board_fen()
         average_evaluation = 0
         legal_moves = list(game_state.legal_moves)
 
@@ -49,5 +49,5 @@ class BruteForce(ChessEngine):
 
     
     def _computer_move(self):
-        return self.__search(self._board, 2)
+        return self.__search(self._board, 3)
             
