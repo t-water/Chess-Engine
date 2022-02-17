@@ -5,6 +5,32 @@ class EvaluationBoard(chess.Board):
     center_squares = chess.SquareSet(chess.BB_CENTER)
     back_rank_squares = chess.SquareSet(chess.BB_BACKRANKS)
 
+    kingside_castle = 'kingside'
+    queenside_castle = 'queenside'
+
+    castling_squares = {
+        chess.WHITE: {
+            kingside_castle: {
+                chess.ROOK: chess.F1,
+                chess.KING: chess.G1
+            },
+            queenside_castle: {
+                chess.ROOK: chess.D1,
+                chess.KING: chess.C1
+            }
+        },
+        chess.BLACK: {
+            kingside_castle: {
+                chess.ROOK: chess.F8,
+                chess.KING: chess.G8
+            },
+            queenside_castle: {
+                chess.ROOK: chess.D8,
+                chess.KING: chess.C8
+            }
+        }
+    }
+
     piece_values = {
         chess.PAWN: 1,
         chess.KNIGHT: 3,
@@ -15,6 +41,7 @@ class EvaluationBoard(chess.Board):
 
     center_square_value = 0.25
     development_value = 0.1
+    castling_value = 1
     checkmate_value = 1000
 
     def __init__(self):
@@ -69,6 +96,30 @@ class EvaluationBoard(chess.Board):
             return -EvaluationBoard.checkmate_value if is_whites_turn else EvaluationBoard.checkmate_value
         
         return 0
+
+    def __has_castled_on_side(self, color, get_castling_rights, side_name):
+        has_castling_rights = get_castling_rights(color)
+        king_square = EvaluationBoard.castling_squares[color][side_name][chess.KING]
+        rook_square = EvaluationBoard.castling_squares[color][side_name][chess.ROOK]
+
+        return not has_castling_rights and self.piece_at(king_square) == chess.KING and self.piece_at(rook_square) == chess.ROOK
+    
+    def __has_castled(self, color):
+        has_castled_kingside = self.__has_castled_on_side(color, lambda c : self.has_kingside_castling_rights(c), EvaluationBoard.kingside_castle)
+        has_castled_queenside = self.__has_castled_on_side(color, lambda c : self.has_queenside_castling_rights(c), EvaluationBoard.queenside_castle)
+
+        return has_castled_kingside or has_castled_queenside
+    
+    def __castling_advantage(self):
+        total = 0
+
+        if self.__has_castled(chess.WHITE):
+            total += EvaluationBoard.castling_value
+        
+        if self.__has_castled(chess.BLACK):
+            total -= EvaluationBoard.castling_value
+
+        return total
     
     def evaluate_position(self):
         evaluation = 0
@@ -79,5 +130,6 @@ class EvaluationBoard(chess.Board):
         evaluation += self.__material_advantage()
         evaluation += self.__center_square_advantage()
         evaluation += self.__development_advantage()
+        evaluation += self.__castling_advantage()
         
         return evaluation
