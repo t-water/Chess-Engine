@@ -1,12 +1,14 @@
 import chess
-from ChessEngine import ChessEngine
+from EvaluationBoard import EvaluationBoard
 
+class NeuralNetwork:
+    def __init__(self):
+        self.reset()
+    
+    def reset(self):
+        self.board = EvaluationBoard()
+    
+    def play_step(self, action):
+        pass
 
-class BruteForce(ChessEngine):
-    def __init__(self, player_color):
-        super().__init__(player_color)
-
-        self.__computer_color = not player_color
-
-        def _computer_move(self):
-            pass
+    
