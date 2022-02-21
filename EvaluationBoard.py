@@ -36,7 +36,8 @@ class EvaluationBoard(chess.Board):
         chess.KNIGHT: 3,
         chess.BISHOP: 3,
         chess.ROOK: 5,
-        chess.QUEEN: 9
+        chess.QUEEN: 9,
+        chess.KING: 100,
     }
 
     center_square_value = 0.25

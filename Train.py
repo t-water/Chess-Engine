@@ -15,7 +15,6 @@ def take_step(game, agent):
     agent.remember(old_state, final_move, reward, new_state, done)
 
     if done:
-        print("DONE!")
         game.reset()
         agent.increment_games_count()
         agent.train_long_memory()

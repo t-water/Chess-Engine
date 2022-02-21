@@ -1,10 +1,13 @@
 from collections import deque
 import random
+
+import chess
 from Linear_QNet import Linear_QNet
 from QTrainer import QTrainer
 from EvaluationBoard import EvaluationBoard
 import numpy as np
 import torch
+import os
 
 MAX_MEMORY = 100000
 BATCH_SIZE = 1000
@@ -21,11 +24,27 @@ class Agent:
         self.model = Linear_QNet(64, 256, MAX_POSSIBLE_MOVES)
         self.trainer = QTrainer(self.model, learning_rate=LEARNING_RATE, gamma=self.gamma)
 
+        file_name='model.pth'
+        model_folder_path = './model'
+        file_name = os.path.join(model_folder_path, file_name)
+        self.model.load_state_dict(torch.load(file_name))
+        self.model.eval()
+
     def increment_games_count(self):
         self.n_games += 1
 
     def get_state(self, game):
-        state = [EvaluationBoard.piece_values.get(game.board.piece_at(square), 0) for square in EvaluationBoard.all_squares]
+        state = []
+
+        for square in EvaluationBoard.all_squares:
+            square_piece = game.board.piece_at(square)
+
+            if square_piece:
+                piece_value = EvaluationBoard.piece_values[square_piece]
+
+                state.append(piece_value if square_piece.color == chess.WHITE else -piece_value)
+            else:
+                state.append(0)
 
         return np.array(state)
 

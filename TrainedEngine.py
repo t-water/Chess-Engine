@@ -5,7 +5,7 @@ class TrainedEngine(ChessEngine):
     def __init__(self, player_color):
         super().__init__(player_color)
 
-        self.agent = Agent(player_color)
+        self.agent = Agent(not player_color)
     
     def _computer_move(self):
         old_state = self.agent.get_state(self)
