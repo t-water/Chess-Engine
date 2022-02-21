@@ -47,6 +47,9 @@ class EvaluationBoard(chess.Board):
     def __init__(self):
         super().__init__()
     
+    def get_legal_moves(self):
+        return list(self.legal_moves)
+    
     def __material_advantage(self):
         total = 0
 
