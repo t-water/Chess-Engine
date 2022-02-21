@@ -15,7 +15,7 @@ class BruteForce(ChessEngine):
         legal_moves = self.__get_legal_moves(game_state)
 
         if ply <= 0 or len(legal_moves) == 0:
-            return (None, self._board.evaluate_position())
+            return (None, self.board.evaluate_position())
         
         best_move = None
         best_move_value = None
@@ -35,7 +35,7 @@ class BruteForce(ChessEngine):
         legal_moves = self.__get_legal_moves(game_state)
 
         if ply <= 0 or len(legal_moves) == 0:
-            return (None, self._board.evaluate_position())
+            return (None, self.board.evaluate_position())
         
         best_move = None
         best_move_value = None
@@ -53,9 +53,9 @@ class BruteForce(ChessEngine):
     
     def __search(self, ply):
         if self.__computer_color == chess.WHITE:
-            return self.__max_value(self._board, ply)[0]
+            return self.__max_value(self.board, ply)[0]
         else:
-            return self.__min_value(self._board, ply)[0]
+            return self.__min_value(self.board, ply)[0]
     
     def _computer_move(self):
         return self.__search(3)

@@ -1,4 +1,4 @@
-from AlphaBetaPruning import AlphaBetaPruning
+from TrainedEngine import TrainedEngine
 
 print('Choose your color')
 print('1. White')
@@ -6,6 +6,6 @@ print('2. Black')
 
 player_color = int(input()) == 1
 
-alpha_beta = AlphaBetaPruning(player_color)
+trained_engine = TrainedEngine(player_color)
 
-alpha_beta.start()
+trained_engine.start()

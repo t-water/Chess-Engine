@@ -6,11 +6,11 @@ from EvaluationBoard import EvaluationBoard
 class ChessEngine(ABC):
     def __init__(self, player_color):
         self.__player_color = player_color
-        self._board = EvaluationBoard()
+        self.board = EvaluationBoard()
 
-    def __print_board(self):
+    def __printboard(self):
         print()
-        print(self._board)
+        print(self.board)
         print()
 
     @abstractmethod
@@ -23,26 +23,26 @@ class ChessEngine(ABC):
 
         while not legal_move_selected:
             try:
-                self._board.push_san(chosen_move)
+                self.board.push_san(chosen_move)
                 legal_move_selected = True
             except ValueError:
                 chosen_move = input("Please input a move:")
 
     def start(self):
-        outcome = self._board.outcome()
+        outcome = self.board.outcome()
 
         while(outcome is None):
-            self.__print_board()
+            self.__printboard()
 
-            is_players_turn = self.__player_color == self._board.turn
+            is_players_turn = self.__player_color == self.board.turn
 
             if is_players_turn:
                 self.__player_move()
             else:
-                self._board.push(self._computer_move())
+                self.board.push(self._computer_move())
             
-            outcome = self._board.outcome()
+            outcome = self.board.outcome()
             
-        self.__print_board()
+        self.__printboard()
         print(outcome)
         print(outcome.result())

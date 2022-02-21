@@ -29,7 +29,7 @@ class AlphaBetaPruning(ChessEngine):
             return self.__min_memo[key]
 
         if ply <= 0 or len(legal_moves) == 0:
-            return (None, self._board.evaluate_position())
+            return (None, self.board.evaluate_position())
         
         best_move = None
         best_move_value = None
@@ -59,7 +59,7 @@ class AlphaBetaPruning(ChessEngine):
             return self.__max_memo[key]
 
         if ply <= 0 or len(legal_moves) == 0:
-            return (None, self._board.evaluate_position())
+            return (None, self.board.evaluate_position())
         
         best_move = None
         best_move_value = None
@@ -83,9 +83,9 @@ class AlphaBetaPruning(ChessEngine):
     
     def __search(self, ply):
         if self.__computer_color == chess.WHITE:
-            return self.__max_value(self._board, ply, -inf, inf)[0]
+            return self.__max_value(self.board, ply, -inf, inf)[0]
         else:
-            return self.__min_value(self._board, ply, -inf, inf)[0]
+            return self.__min_value(self.board, ply, -inf, inf)[0]
     
     def _computer_move(self):
         return self.__search(4)

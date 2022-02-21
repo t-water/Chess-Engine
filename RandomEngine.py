@@ -7,6 +7,6 @@ class RandomEngine(ChessEngine):
         super().__init__(player_color)
     
     def _computer_move(self):
-        choice = random.choice(list(self._board.legal_moves))
+        choice = random.choice(list(self.board.legal_moves))
 
         return choice
