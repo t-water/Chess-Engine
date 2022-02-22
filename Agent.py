@@ -24,11 +24,11 @@ class Agent:
         self.model = Linear_QNet(64, 256, MAX_POSSIBLE_MOVES)
         self.trainer = QTrainer(self.model, learning_rate=LEARNING_RATE, gamma=self.gamma)
 
-        file_name='model.pth'
-        model_folder_path = './model'
-        file_name = os.path.join(model_folder_path, file_name)
-        self.model.load_state_dict(torch.load(file_name))
-        self.model.eval()
+        # file_name='model.pth'
+        # model_folder_path = './model'
+        # file_name = os.path.join(model_folder_path, file_name)
+        # self.model.load_state_dict(torch.load(file_name))
+        # self.model.eval()
 
     def increment_games_count(self):
         self.n_games += 1
@@ -40,7 +40,7 @@ class Agent:
             square_piece = game.board.piece_at(square)
 
             if square_piece:
-                piece_value = EvaluationBoard.piece_values[square_piece]
+                piece_value = EvaluationBoard.piece_values[square_piece.piece_type]
 
                 state.append(piece_value if square_piece.color == chess.WHITE else -piece_value)
             else:
