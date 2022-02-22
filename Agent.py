@@ -1,13 +1,10 @@
 from collections import deque
 import random
 
-import chess
 from Linear_QNet import Linear_QNet
 from QTrainer import QTrainer
 from EvaluationBoard import EvaluationBoard
-import numpy as np
 import torch
-import os
 
 MAX_MEMORY = 100000
 BATCH_SIZE = 1000
@@ -34,19 +31,7 @@ class Agent:
         self.n_games += 1
 
     def get_state(self, game):
-        state = []
-
-        for square in EvaluationBoard.all_squares:
-            square_piece = game.board.piece_at(square)
-
-            if square_piece:
-                piece_value = EvaluationBoard.piece_values[square_piece.piece_type]
-
-                state.append(piece_value if square_piece.color == chess.WHITE else -piece_value)
-            else:
-                state.append(0)
-
-        return np.array(state)
+        return game.board.state
 
     def remember(self, state, action, reward, next_state, done):
         self.memory.append((state, action, reward, next_state, done))

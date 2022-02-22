@@ -1,4 +1,5 @@
 import chess
+import numpy as np
 
 class EvaluationBoard(chess.Board):
     all_squares = chess.SquareSet(chess.BB_ALL)
@@ -47,6 +48,38 @@ class EvaluationBoard(chess.Board):
 
     def __init__(self):
         super().__init__()
+        self.state = np.array([])
+
+        self.initialize_state()
+    
+    def initialize_state(self):
+        state = []
+
+        for square in EvaluationBoard.all_squares:
+            square_piece = self.board.piece_at(square)
+
+            if square_piece:
+                piece_value = EvaluationBoard.piece_values[square_piece.piece_type]
+
+                state.append(piece_value if square_piece.color == chess.WHITE else -piece_value)
+            else:
+                state.append(0)
+
+        self.state = np.array(state)
+    
+    def move(self, action):
+        legal_moves = self.get_legal_moves()
+
+        selected_move_index = action.index(1)
+        selected_move = legal_moves[selected_move_index]
+
+        from_square = selected_move.from_square
+        to_square = selected_move.to_square
+
+        self.state[to_square] = self.state[from_square]
+        self.state[from_square] = 0 
+        
+        self.push(selected_move)
     
     def get_legal_moves(self):
         return list(self.legal_moves)
