@@ -3,17 +3,18 @@ import torch.nn as nn
 import torch.optim as optim
 
 class QTrainer:
-    def __init__(self, model, learning_rate, gamma):
+    def __init__(self, model, learning_rate, gamma, device):
         self.learning_rate = learning_rate
         self.gamma = gamma
         self.model = model
+        self.device = device
         self.optimizer = optim.Adam(model.parameters(), lr=self.learning_rate)
         self.criterion = nn.MSELoss()
 
     def train_step(self, state, action, reward, next_state, done):
-        state = torch.tensor(state, dtype=torch.float)
-        next_state = torch.tensor(next_state, dtype=torch.float)
-        reward = torch.tensor(reward, dtype=torch.float)
+        state = torch.tensor(state, dtype=torch.float).to(self.device)
+        next_state = torch.tensor(next_state, dtype=torch.float).to(self.device)
+        reward = torch.tensor(reward, dtype=torch.float).to(self.device)
 
         if len(state.shape) == 1:
             state = torch.unsqueeze(state, 0)

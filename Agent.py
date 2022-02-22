@@ -3,7 +3,6 @@ import random
 
 from Linear_QNet import Linear_QNet
 from QTrainer import QTrainer
-from EvaluationBoard import EvaluationBoard
 import torch
 
 MAX_MEMORY = 100000
@@ -12,14 +11,15 @@ LEARNING_RATE = 0.001
 MAX_POSSIBLE_MOVES = 32 * 27
 
 class Agent:
-    def __init__(self, color):
+    def __init__(self, color, device):
         self.color = color
+        self.device = device
         self.n_games = 0
         self.epsilon = 0
         self.gamma = 0.9
         self.memory = deque(maxlen=MAX_MEMORY)
-        self.model = Linear_QNet(64, 256, MAX_POSSIBLE_MOVES)
-        self.trainer = QTrainer(self.model, learning_rate=LEARNING_RATE, gamma=self.gamma)
+        self.model = Linear_QNet(64, 256, MAX_POSSIBLE_MOVES).to(self.device)
+        self.trainer = QTrainer(self.model, LEARNING_RATE, self.gamma, self.device)
 
         # file_name='model.pth'
         # model_folder_path = './model'
@@ -52,7 +52,7 @@ class Agent:
         num_legal_moves = len(game.board.get_legal_moves())
         self.epsilon = 80 - self.n_games
 
-        state_tensor = torch.tensor(state, dtype=torch.float)
+        state_tensor = torch.tensor(state, dtype=torch.float).to(self.device)
         prediction = self.model(state_tensor)
         prediction = [prediction[i] for i in range(num_legal_moves)]
         

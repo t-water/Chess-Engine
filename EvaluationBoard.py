@@ -56,7 +56,7 @@ class EvaluationBoard(chess.Board):
         state = []
 
         for square in EvaluationBoard.all_squares:
-            square_piece = self.board.piece_at(square)
+            square_piece = self.piece_at(square)
 
             if square_piece:
                 piece_value = EvaluationBoard.piece_values[square_piece.piece_type]

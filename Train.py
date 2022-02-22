@@ -1,6 +1,7 @@
 import chess
 from Agent import Agent
 from NeuralNetwork import NeuralNetwork
+import torch
 
 def finish_game(agent):
     agent.increment_games_count()
@@ -16,14 +17,19 @@ def take_step(game, agent):
     final_move = agent.get_action(game, old_state)
 
     reward, done = game.play_step(final_move, agent.color)
+
     new_state = agent.get_state(game)
         
     return old_state, final_move, reward, new_state, done
 
 def train():
-    white_agent = Agent(chess.WHITE)
-    black_agent = Agent(chess.BLACK)
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+    white_agent = Agent(chess.WHITE, device)
+    black_agent = Agent(chess.BLACK, device)
     game = NeuralNetwork()
+
+    count = 0
 
     game_finished = False
     current_color = chess.WHITE
@@ -45,6 +51,9 @@ def train():
 
             current_color = chess.WHITE
             game_finished = False
+
+            count += 1
+            print(f"COUNT: {count}")
         else:
             current_color = not current_color
 
