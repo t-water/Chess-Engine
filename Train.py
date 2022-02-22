@@ -18,6 +18,11 @@ def take_step(game, agent):
 
     reward, done = game.play_step(final_move, agent.color)
 
+    if done:
+        print()
+        print(game.board)
+        print()
+
     new_state = agent.get_state(game)
         
     return old_state, final_move, reward, new_state, done
@@ -49,11 +54,11 @@ def train():
             finish_game(white_agent)
             finish_game(black_agent)
 
+            count += 1
+            print(f"COUNT: {count} REWARD: {reward} CURRENT COLOR: {current_color}")
+
             current_color = chess.WHITE
             game_finished = False
-
-            count += 1
-            print(f"COUNT: {count}")
         else:
             current_color = not current_color
 
