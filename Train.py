@@ -1,65 +1,73 @@
+
 import chess
+import torch
+import random
 from Agent import Agent
 from NeuralNetwork import NeuralNetwork
-import torch
-
-def finish_game(agent):
-    agent.increment_games_count()
-    agent.train_long_memory()
-    agent.model.save()    
-
-def train_memory(agent, old_state, final_move, reward, new_state, done):
-    agent.train_short_memory(old_state, final_move, reward, new_state, done)
-    agent.remember(old_state, final_move, reward, new_state, done)
+from RandomEngine import RandomEngine
 
 def take_step(game, agent):
     old_state = agent.get_state(game)
     final_move = agent.get_action(game, old_state)
 
     reward, done = game.play_step(final_move, agent.color)
-
-    if done:
-        print()
-        print(game.board)
-        print()
-
-    new_state = agent.get_state(game)
-        
+    new_state = agent.get_state(game)         
+    
     return old_state, final_move, reward, new_state, done
+
+def train_short_memory(agent, old_state, final_move, reward, new_state, done):
+    agent.train_short_memory(old_state, final_move, reward, new_state, done)
+    agent.remember(old_state, final_move, reward, new_state, done)  
+
+def finish_game(game, agent):
+    game.reset()
+    agent.increment_games_count()
+    agent.train_long_memory()
+
+    if agent.n_games % 100 == 0:
+        agent.model.save()
 
 def train():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    wins = 0
+    losses = 0
+    draws = 0
 
     white_agent = Agent(chess.WHITE, device)
-    black_agent = Agent(chess.BLACK, device)
     game = NeuralNetwork()
 
-    count = 0
-
     game_finished = False
-    current_color = chess.WHITE
 
     while True:
-        current_agent = white_agent if current_color == chess.WHITE else black_agent
+        old_state, final_move, reward, new_state, game_finished = take_step(game, white_agent)
+        
+        if not game_finished:
+            num_legal_moves = len(list(game.board.legal_moves))
+            action = [0 for _ in range(num_legal_moves)]
+            move = random.randint(0, num_legal_moves-1)
+            action[move] = 1
 
-        old_state, final_move, reward, new_state, done = take_step(game, current_agent)
-        game_finished = done
+            reward, game_finished = game.play_step(action, chess.BLACK)
 
-        train_memory(white_agent, old_state, final_move, reward, new_state, done)
-        train_memory(black_agent, old_state, final_move, reward, new_state, done)
+            if reward > 0.5:
+                reward *= -1
+        
+        train_short_memory(white_agent, old_state, final_move, reward, new_state, game_finished)
 
         if game_finished:
-            game.reset()
-            
-            finish_game(white_agent)
-            finish_game(black_agent)
+            if reward > 0.5:
+                wins += 1
+            elif reward < 0.5:
+                losses += 1
+            else:
+                draws += 1
 
-            count += 1
-            print(f"COUNT: {count} REWARD: {reward} CURRENT COLOR: {current_color}")
-
-            current_color = chess.WHITE
-            game_finished = False
-        else:
-            current_color = not current_color
+            print("---------------------------------------------")
+            print()
+            print(game.board)
+            print()
+            print(f"OUTCOME: {game.board.outcome().termination} REWARD: {reward}")
+            print(f"{wins}-{losses}-{draws} ({wins + losses + draws})")
+            finish_game(game, white_agent)
 
 train()

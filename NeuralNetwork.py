@@ -1,5 +1,4 @@
 from EvaluationBoard import EvaluationBoard
-import chess
 
 class NeuralNetwork:
     def __init__(self):
@@ -15,17 +14,12 @@ class NeuralNetwork:
         reward = 0
 
         if self.board.outcome():
-            termination = self.board.outcome().termination
-            print(termination)
             game_over = True
 
             if self.board.is_checkmate():
                 reward = -1 if self.board.turn == color else 1
             else:
-                if termination == chess.Termination.FIVEFOLD_REPETITION:
-                    reward = -0.5
-                else:
-                    reward = 0.5
+                reward = 0.5
         
         return reward, game_over
 

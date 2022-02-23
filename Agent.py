@@ -8,7 +8,7 @@ import torch
 MAX_MEMORY = 100000
 BATCH_SIZE = 1000
 LEARNING_RATE = 0.001
-MAX_POSSIBLE_MOVES = 32 * 27
+MAX_POSSIBLE_MOVES = 64 * 64
 
 class Agent:
     def __init__(self, color, device):
@@ -49,20 +49,19 @@ class Agent:
         self.trainer.train_step(state, action, reward, next_state, done)
     
     def get_action(self, game, state):
-        num_legal_moves = len(game.board.get_legal_moves())
         self.epsilon = 80 - self.n_games
-
-        state_tensor = torch.tensor(state, dtype=torch.float).to(self.device)
-        prediction = self.model(state_tensor)
-        prediction = [prediction[i] for i in range(num_legal_moves)]
         
-        final_move = [0 for _ in range(num_legal_moves)]
+        final_move = [0 for _ in range(MAX_POSSIBLE_MOVES)]
         move = 0
 
         if random.randint(0, 200) < self.epsilon:
-            move = random.randint(0, num_legal_moves-1)
+            legal_moves = game.board.get_legal_moves()
+            random_legal_move = random.choice(legal_moves)
+            move = random_legal_move.from_square * 64 + random_legal_move.to_square
         else:
-            move = max(range(len(prediction)), key=prediction.__getitem__)
+            state_tensor = torch.tensor(state, dtype=torch.float).to(self.device)
+            prediction = self.model(state_tensor)
+            move = torch.argmax(prediction).item()
 
         final_move[move] = 1
 

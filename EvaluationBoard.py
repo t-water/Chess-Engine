@@ -71,13 +71,17 @@ class EvaluationBoard(chess.Board):
         legal_moves = self.get_legal_moves()
 
         selected_move_index = action.index(1)
-        selected_move = legal_moves[selected_move_index]
+        model_from_square = selected_move_index // 64
+        model_to_square = selected_move_index % 64
+        
+        legal_moves.sort(key = lambda move : abs(move.from_square - model_from_square) + abs(move.to_square - model_to_square))
+        selected_move = legal_moves[0]
 
-        from_square = selected_move.from_square
-        to_square = selected_move.to_square
+        final_from_square = selected_move.from_square
+        final_to_square = selected_move.to_square
 
-        self.state[to_square] = self.state[from_square]
-        self.state[from_square] = 0 
+        self.state[final_to_square] = self.state[final_from_square]
+        self.state[final_from_square] = 0 
         
         self.push(selected_move)
     
