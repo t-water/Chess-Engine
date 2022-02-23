@@ -50,7 +50,7 @@ def train():
             reward, game_finished = game.play_step(action, chess.BLACK)
 
             if reward > 0.5:
-                reward *= -1
+                reward = 0 if reward == 1 else 1
         
         train_short_memory(white_agent, old_state, final_move, reward, new_state, game_finished)
 

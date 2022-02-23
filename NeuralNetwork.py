@@ -17,7 +17,7 @@ class NeuralNetwork:
             game_over = True
 
             if self.board.is_checkmate():
-                reward = -1 if self.board.turn == color else 1
+                reward = 0 if self.board.turn == color else 1
             else:
                 reward = 0.5
         
