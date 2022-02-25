@@ -19,12 +19,12 @@ def train_short_memory(agent, old_state, final_move, reward, new_state, done):
     agent.train_short_memory(old_state, final_move, reward, new_state, done)
     agent.remember(old_state, final_move, reward, new_state, done)  
 
-def finish_game(game, agent):
+def finish_game(game, agent, reward):
     game.reset()
     agent.increment_games_count()
     agent.train_long_memory()
 
-    if agent.n_games % 100 == 0:
+    if reward > 0.5:
         agent.model.save()
 
 def train():
@@ -49,8 +49,8 @@ def train():
 
             reward, game_finished = game.play_step(action, chess.BLACK)
 
-            if reward > 0.5:
-                reward = 0 if reward == 1 else 1
+            if reward != 0.5:
+                reward *= -1
         
         train_short_memory(white_agent, old_state, final_move, reward, new_state, game_finished)
 
@@ -62,12 +62,17 @@ def train():
             else:
                 draws += 1
 
-            print("---------------------------------------------")
-            print()
-            print(game.board)
-            print()
-            print(f"OUTCOME: {game.board.outcome().termination} REWARD: {reward}")
-            print(f"{wins}-{losses}-{draws} ({wins + losses + draws})")
-            finish_game(game, white_agent)
+            total = wins + losses + draws
+
+            if total % 50 == 0:
+                print("---------------------------------------------")
+                print()
+                print(game.board)
+                print()
+                print(f"OUTCOME: {game.board.outcome().termination} REWARD: {reward}")
+                print(f"{wins}-{losses}-{draws} ({total})")
+
+
+            finish_game(game, white_agent, reward)
 
 train()

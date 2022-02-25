@@ -7,7 +7,7 @@ import torch
 
 MAX_MEMORY = 100000
 BATCH_SIZE = 1000
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.2
 MAX_POSSIBLE_MOVES = 64 * 64
 
 class Agent:
@@ -49,12 +49,12 @@ class Agent:
         self.trainer.train_step(state, action, reward, next_state, done)
     
     def get_action(self, game, state):
-        self.epsilon = 80 - self.n_games
+        self.epsilon = 10000 - self.n_games
         
         final_move = [0 for _ in range(MAX_POSSIBLE_MOVES)]
         move = 0
 
-        if random.randint(0, 200) < self.epsilon:
+        if random.randint(0, 50000) < self.epsilon:
             legal_moves = game.board.get_legal_moves()
             random_legal_move = random.choice(legal_moves)
             move = random_legal_move.from_square * 64 + random_legal_move.to_square
